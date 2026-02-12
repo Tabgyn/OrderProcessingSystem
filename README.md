@@ -74,7 +74,7 @@ OrderProcessingSystem/
 ## Development Status
 
 - [x] Stage 1: Project foundation and infrastructure setup
-- [ ] Stage 2: Event contracts and shared infrastructure
+- [x] Stage 2: Event contracts and shared infrastructure
 - [ ] Stage 3: OrderService implementation
 - [ ] Stage 4: Inventory and Payment services
 - [ ] Stage 5: Notification and Analytics services
