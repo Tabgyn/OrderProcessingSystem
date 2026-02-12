@@ -27,7 +27,7 @@ Real-time order processing system demonstrating event-driven architecture patter
 
 1. Clone the repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/Tabgyn/OrderProcessingSystem.git
 cd OrderProcessingSystem
 ```
 
