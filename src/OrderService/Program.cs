@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OrderService.Application.Commands;
 using OrderService.Application.Queries;
+using OrderService.Consumers;
 using OrderService.Data;
 using OrderService.Infrastructure;
 using SharedKernel.Messaging;
@@ -34,6 +35,12 @@ builder.Services.AddSingleton(rabbitMqSettings!);
 
 // Event Bus
 builder.Services.AddSingleton<IEventBus, RabbitMqEventBus>();
+
+// Event Consumers
+builder.Services.AddHostedService<InventoryReservedConsumer>();
+builder.Services.AddHostedService<InventoryReservationFailedConsumer>();
+builder.Services.AddHostedService<PaymentProcessedConsumer>();
+builder.Services.AddHostedService<PaymentFailedConsumer>();
 
 var app = builder.Build();
 
