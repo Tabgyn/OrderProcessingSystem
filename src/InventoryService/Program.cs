@@ -43,7 +43,6 @@ if (app.Environment.IsDevelopment())
     await dbContext.Database.MigrateAsync();
 }
 
-app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
