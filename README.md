@@ -75,9 +75,9 @@ OrderProcessingSystem/
 
 - [x] Stage 1: Project foundation and infrastructure setup
 - [x] Stage 2: Event contracts and shared infrastructure
-- [ ] Stage 3: OrderService implementation
-- [ ] Stage 4: Inventory and Payment services
-- [ ] Stage 5: Notification and Analytics services
+- [x] Stage 3: OrderService implementation
+- [x] Stage 4: Inventory and Payment services
+- [x] Stage 5: Notification and Analytics services
 - [ ] Stage 6: Testing and documentation
 
 ## License
