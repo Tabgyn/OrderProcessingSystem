@@ -2,12 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using PaymentService.Consumers;
 using PaymentService.Data;
 using PaymentService.Infrastructure;
+using Scalar.AspNetCore;
 using SharedKernel.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApi();
 
 // Database
 builder.Services.AddDbContext<PaymentDbContext>(options =>
@@ -34,6 +36,9 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+
     // Apply migrations
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<PaymentDbContext>();

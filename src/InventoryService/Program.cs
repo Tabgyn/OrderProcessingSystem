@@ -3,11 +3,13 @@ using InventoryService.Consumers;
 using InventoryService.Data;
 using InventoryService.Infrastructure;
 using SharedKernel.Messaging;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApi();
 
 // Database
 builder.Services.AddDbContext<InventoryDbContext>(options =>
@@ -32,6 +34,9 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+
     // Apply migrations and seed data
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();

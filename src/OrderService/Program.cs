@@ -4,6 +4,7 @@ using OrderService.Application.Queries;
 using OrderService.Consumers;
 using OrderService.Data;
 using OrderService.Infrastructure;
+using Scalar.AspNetCore;
 using SharedKernel.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApi();
 
 // Database
 builder.Services.AddDbContext<OrderDbContext>(options =>
@@ -51,6 +53,10 @@ app.MapControllers();
 // Apply migrations on startup (development only)
 if (app.Environment.IsDevelopment())
 {
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+
+    // Apply migrations
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
     await dbContext.Database.MigrateAsync();
