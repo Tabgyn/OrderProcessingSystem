@@ -4,6 +4,7 @@ using AnalyticsService.Data;
 using AnalyticsService.Infrastructure;
 using SharedKernel.Messaging;
 using Scalar.AspNetCore;
+using SharedKernel.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,14 @@ builder.Services.AddScoped<IMetricsService, MetricsService>();
 var rabbitMqSettings = builder.Configuration.GetSection(RabbitMqSettings.SectionName).Get<RabbitMqSettings>();
 rabbitMqSettings?.Validate();
 builder.Services.AddSingleton(rabbitMqSettings!);
+
+builder.Services.AddHealthChecks()
+    .AddNpgSql(
+        name: "postgresql",
+        tags: new[] { "db" })
+    .AddRabbitMQ(
+        name: "rabbitmq",
+        tags: new[] { "messaging" });
 
 // Event Bus
 builder.Services.AddSingleton<IEventBus, RabbitMqEventBus>();
@@ -50,5 +59,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapHealthCheckEndpoints();
 
 app.Run();

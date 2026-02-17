@@ -1,10 +1,13 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OrderService.Application.Commands;
 using OrderService.Application.Queries;
 using OrderService.Consumers;
 using OrderService.Data;
 using OrderService.Infrastructure;
+using RabbitMQ.Client;
 using Scalar.AspNetCore;
+using SharedKernel.Extensions;
 using SharedKernel.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +38,33 @@ var rabbitMqSettings = builder.Configuration.GetSection(RabbitMqSettings.Section
 rabbitMqSettings?.Validate();
 builder.Services.AddSingleton(rabbitMqSettings!);
 
+// Add after RabbitMQ configuration
+builder.Services.AddHealthChecks()
+    .AddNpgSql(
+        connectionString: builder.Configuration.GetConnectionString("OrderDatabase")!,
+        name: "postgresql",
+        tags: new[] { "db" })
+    .AddCheck("rabbitmq", () =>
+    {
+        try
+        {
+            var factory = new ConnectionFactory
+            {
+                HostName = rabbitMqSettings!.Host,
+                Port = rabbitMqSettings.Port,
+                UserName = rabbitMqSettings.Username,
+                Password = rabbitMqSettings.Password,
+                VirtualHost = rabbitMqSettings.VirtualHost
+            };
+            using var connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
+            return HealthCheckResult.Healthy("RabbitMQ connection successful");
+        }
+        catch (Exception ex)
+        {
+            return HealthCheckResult.Unhealthy("RabbitMQ connection failed", ex);
+        }
+    }, tags: new[] { "messaging" });
+
 // Event Bus
 builder.Services.AddSingleton<IEventBus, RabbitMqEventBus>();
 
@@ -48,6 +78,8 @@ var app = builder.Build();
 
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapHealthCheckEndpoints();
 
 // Apply migrations on startup (development only)
 if (app.Environment.IsDevelopment())

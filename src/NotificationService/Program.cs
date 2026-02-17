@@ -3,6 +3,7 @@ using NotificationService.Consumers;
 using NotificationService.Data;
 using NotificationService.Infrastructure;
 using Scalar.AspNetCore;
+using SharedKernel.Extensions;
 using SharedKernel.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +26,14 @@ builder.Services.AddSingleton<INotificationSender, MockNotificationSender>();
 var rabbitMqSettings = builder.Configuration.GetSection(RabbitMqSettings.SectionName).Get<RabbitMqSettings>();
 rabbitMqSettings?.Validate();
 builder.Services.AddSingleton(rabbitMqSettings!);
+
+builder.Services.AddHealthChecks()
+    .AddNpgSql(
+        name: "postgresql",
+        tags: new[] { "db" })
+    .AddRabbitMQ(
+        name: "rabbitmq",
+        tags: new[] { "messaging" });
 
 // Event Bus
 builder.Services.AddSingleton<IEventBus, RabbitMqEventBus>();
@@ -54,5 +63,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapHealthCheckEndpoints();
 
 app.Run();
